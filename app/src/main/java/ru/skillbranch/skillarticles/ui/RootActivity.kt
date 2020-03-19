@@ -62,7 +62,7 @@ class RootActivity : AppCompatActivity() {
 
   private fun setupSubmenu() {
     btn_like.setOnClickListener { viewModel.handleLike() }
-    btn_bookmark.setOnClickListener { viewModel.handleBookmarks() }
+    btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
     btn_share.setOnClickListener { viewModel.handleShare() }
     btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
   }

@@ -82,7 +82,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     notify(msg)
   }
 
-  fun handleBookmarks() {
+  fun handleBookmark() {
   }
 
   fun handleShare() {

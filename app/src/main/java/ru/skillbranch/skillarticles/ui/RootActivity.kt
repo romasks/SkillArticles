@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottom_bar.*
 import kotlinx.android.synthetic.main.layout_submenu.*
@@ -13,6 +14,7 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
+import ru.skillbranch.skillarticles.viewmodels.Notify
 import ru.skillbranch.skillarticles.viewmodels.ViewModelFactory
 
 class RootActivity : AppCompatActivity() {
@@ -30,6 +32,9 @@ class RootActivity : AppCompatActivity() {
     viewModel = ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)
     viewModel.observeState(this) {
       renderUi(it)
+    }
+    viewModel.observeNotifications(this) {
+      renderNotification(it)
     }
   }
 
@@ -93,5 +98,38 @@ class RootActivity : AppCompatActivity() {
     toolbar.title = data.title ?: "loading"
     toolbar.subtitle = data.category ?: "loading"
     if (data.categoryIcon != null) toolbar.logo = getDrawable(data.categoryIcon as Int)
+  }
+
+  private fun renderNotification(notify: Notify) {
+    val snackbar = Snackbar.make(coordinator_container, notify.message, Snackbar.LENGTH_LONG)
+      .setAnchorView(bottombar)
+
+    when (notify) {
+      is Notify.TextMessage -> {
+        /*nothing*/
+      }
+
+      is Notify.ActionMessage -> {
+        with(snackbar) {
+          setActionTextColor(getColor(R.color.color_accent_dark))
+          setAction(notify.actionLabel) {
+            notify.actionHandler?.invoke()
+          }
+        }
+      }
+
+      is Notify.ErrorMessage -> {
+        with(snackbar) {
+          setBackgroundTint(getColor(R.color.design_default_color_error))
+          setTextColor(getColor(android.R.color.white))
+          setActionTextColor(getColor(android.R.color.white))
+          setAction(notify.errLabel) {
+            notify.errHandler?.invoke()
+          }
+        }
+      }
+    }
+
+    snackbar.show()
   }
 }

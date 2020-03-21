@@ -45,8 +45,7 @@ class RootActivity : AppCompatActivity() {
     val logo = if (toolbar.childCount > 2) toolbar.getChildAt(2) as ImageView else null
     logo?.scaleType = ImageView.ScaleType.CENTER_CROP
 
-    val lp = logo?.layoutParams as Toolbar.LayoutParams
-    lp?.let {
+    (logo?.layoutParams as Toolbar.LayoutParams)?.let {
       it.width = this.dpToIntPx(40)
       it.height = this.dpToIntPx(40)
       it.marginEnd = this.dpToIntPx(16)
@@ -95,8 +94,8 @@ class RootActivity : AppCompatActivity() {
     tv_text_content.text = if (data.isLoadingContent) "loading" else data.content.first() as String
 
     // bind toolbar
-    toolbar.title = data.title ?: "loading"
-    toolbar.subtitle = data.category ?: "loading"
+    toolbar.title = data.title ?: "Skill Articles"
+    toolbar.subtitle = data.category ?: "loading..."
     if (data.categoryIcon != null) toolbar.logo = getDrawable(data.categoryIcon as Int)
   }
 
@@ -108,7 +107,6 @@ class RootActivity : AppCompatActivity() {
       is Notify.TextMessage -> {
         /*nothing*/
       }
-
       is Notify.ActionMessage -> {
         with(snackbar) {
           setActionTextColor(getColor(R.color.color_accent_dark))
@@ -117,7 +115,6 @@ class RootActivity : AppCompatActivity() {
           }
         }
       }
-
       is Notify.ErrorMessage -> {
         with(snackbar) {
           setBackgroundTint(getColor(R.color.design_default_color_error))

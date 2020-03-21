@@ -95,7 +95,7 @@ class ViewModelFactory(private val params: String) : ViewModelProvider.Factory {
 }
 
 class Event<out E>(private val content: E) {
-    var hasBeenHandled = false
+    private var hasBeenHandled = false
 
     /***
      * возвращает контент который еще не был обработан иначе null

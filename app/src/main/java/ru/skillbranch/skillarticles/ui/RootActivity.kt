@@ -1,10 +1,15 @@
 package ru.skillbranch.skillarticles.ui
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuItemCompat
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
@@ -21,6 +26,9 @@ class RootActivity : AppCompatActivity() {
 
   private lateinit var viewModel: ArticleViewModel
 
+  private var isSearch: Boolean = false
+  private var queryString: String? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_root)
@@ -36,6 +44,61 @@ class RootActivity : AppCompatActivity() {
     viewModel.observeNotifications(this) {
       renderNotification(it)
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    menuInflater.inflate(R.menu.menu_search, menu)
+
+    val searchItem = menu?.findItem(R.id.action_search)
+    searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+      override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+        viewModel.saveSearchViewState(true, queryString)
+        return true
+      }
+
+      override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+        viewModel.saveSearchViewState(false, queryString)
+        // invalidateOptionsMenu()
+        return true
+      }
+    })
+
+    if (isSearch) searchItem?.expandActionView()
+
+    val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
+    searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+      override fun onQueryTextSubmit(query: String?): Boolean {
+        queryString = ""
+        viewModel.saveSearchViewState(true, queryString)
+        return false
+      }
+
+      override fun onQueryTextChange(newText: String?): Boolean {
+        if (!newText.isNullOrBlank()) queryString = newText
+        viewModel.saveSearchViewState(true, queryString)
+        return false
+      }
+    })
+
+    searchView.setQuery(queryString, false)
+
+    return true
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+      android.R.id.home -> {
+        onBackPressed()
+      }
+      R.id.action_search -> {
+        Toast.makeText(this, "Search Selected", Toast.LENGTH_SHORT).show()
+      }
+    }
+    return true
+  }
+
+  override fun onBackPressed() {
+    Toast.makeText(this, "Back", Toast.LENGTH_SHORT).show()
   }
 
   private fun setupToolbar() {
@@ -67,6 +130,10 @@ class RootActivity : AppCompatActivity() {
   }
 
   private fun renderUi(data: ArticleState) {
+    // bind search view
+    isSearch = data.isSearch
+    queryString = data.searchQuery
+
     // bind submenu state
     btn_settings.isChecked = data.isShowMenu
     if (data.isShowMenu) submenu.open() else submenu.close()

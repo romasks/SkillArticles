@@ -29,6 +29,8 @@
         <item name="colorOnPrimary">@color/color_on_article_bar</item>
         <item name="colorSurface">@color/color_article_bar</item>
         <item name="colorControlNormal">@color/color_on_article_bar</item>
+        <item name="android:editTextColor">@color/color_on_article_bar</item>
+        <item name="android:textColorHint">@color/color_gray</item>
     </style>
 
     <style name="ArticleToolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
@@ -37,15 +39,12 @@
     </style>
 
     <style name="AppSearchViewStyle" parent="Widget.AppCompat.SearchView">
-      <item name="android:imeActionId">6</item>
-      <item name="android:editTextColor">@color/color_on_article_bar</item>
-      <item name="android:textCursorDrawable">@color/color_on_article_bar</item>
-      <item name="android:textColor">@color/color_on_article_bar</item>
-      <item name="android:textColorHint">@color/color_on_article_bar</item>
-      <item name="searchIcon">@drawable/ic_search_black_24dp</item>
-      <item name="closeIcon" tools:ignore="PrivateResource">@drawable/ic_clear_black_24dp</item>
-      <item name="queryBackground">@android:color/transparent</item>
-      <item name="queryHint">@string/hint_search</item>
+        <item name="android:imeActionId">6</item>
+        <item name="android:textCursorDrawable">@color/color_on_article_bar</item>
+        <item name="searchIcon">@drawable/ic_search_black_24dp</item>
+        <item name="closeIcon" tools:ignore="PrivateResource">@drawable/ic_clear_black_24dp</item>
+        <item name="queryBackground">@android:color/transparent</item>
+        <item name="queryHint">@string/hint_search</item>
     </style>
 
     <style name="BottombarIcon">

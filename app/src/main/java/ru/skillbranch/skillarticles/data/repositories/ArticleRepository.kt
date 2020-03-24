@@ -6,7 +6,6 @@ import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.LocalDataHolder
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
-import ru.skillbranch.skillarticles.data.SearchState
 
 object ArticleRepository {
     private val local = LocalDataHolder
@@ -24,10 +23,6 @@ object ArticleRepository {
         return local.findArticlePersonalInfo(articleId) //1s delay from db
     }
 
-    fun loadSearchState(articleId: String): LiveData<SearchState?> {
-        return local.findSearchState(articleId) //1s delay from db
-    }
-
     fun getAppSettings(): LiveData<AppSettings> = local.getAppSettings() //from preferences
 
     fun updateSettings(appSettings: AppSettings) {
@@ -36,9 +31,5 @@ object ArticleRepository {
 
     fun updateArticlePersonalInfo(info: ArticlePersonalInfo) {
         local.updateArticlePersonalInfo(info)
-    }
-
-    fun updateSearchState(state: SearchState) {
-        local.updateSearchState(state)
     }
 }

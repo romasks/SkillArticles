@@ -18,8 +18,6 @@ object LocalDataHolder {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val articleInfo = MutableLiveData<ArticlePersonalInfo?>(null)
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val searchState = MutableLiveData<SearchState?>(null)
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val settings = MutableLiveData(AppSettings())
 
 
@@ -51,16 +49,6 @@ object LocalDataHolder {
         return articleInfo
     }
 
-    fun findSearchState(articleId: String): LiveData<SearchState?> {
-        GlobalScope.launch {
-            if (isDelay) delay(500)
-            withContext(Dispatchers.Main){
-                searchState.value = SearchState()
-            }
-        }
-        return searchState
-    }
-
     fun getAppSettings() = settings
 
     fun updateAppSettings(appSettings: AppSettings) {
@@ -71,14 +59,9 @@ object LocalDataHolder {
         articleInfo.value = info
     }
 
-    fun updateSearchState(state: SearchState) {
-        searchState.value = state
-    }
-
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun clearData(){
         articleInfo.postValue(null)
-        searchState.postValue(null)
         articleData.postValue(null)
         settings.postValue(AppSettings())
     }
@@ -130,11 +113,6 @@ data class ArticleData(
 data class ArticlePersonalInfo(
     val isLike: Boolean = false,
     val isBookmark: Boolean = false
-)
-
-data class SearchState(
-    val isSearch: Boolean = false,
-    val searchQuery: String? = null
 )
 
 data class AppSettings(

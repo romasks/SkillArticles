@@ -3,7 +3,6 @@ package ru.skillbranch.skillarticles.viewmodels
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
-import ru.skillbranch.skillarticles.extensions.data.toSearchState
 import ru.skillbranch.skillarticles.extensions.format
 
 class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
@@ -39,14 +38,6 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
       )
     }
 
-    subscribeOnDataSource(getSearchState()) { searchState, state ->
-      searchState ?: return@subscribeOnDataSource null
-      state.copy(
-        isSearch = searchState.isSearch,
-        searchQuery = searchState.searchQuery
-      )
-    }
-
     subscribeOnDataSource(repository.getAppSettings()) { settings, state ->
       state.copy(
         isDarkMode = settings.isDarkMode,
@@ -63,11 +54,9 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
 
   // load data from db
   private fun getArticlePersonalInfo() = repository.loadArticlePersonalInfo(articleId)
-  private fun getSearchState() = repository.loadSearchState(articleId)
 
   override fun saveSearchViewState(isSearch: Boolean, searchQuery: String?) {
-    val state = currentState.toSearchState()
-    repository.updateSearchState(state.copy(isSearch = isSearch, searchQuery = searchQuery))
+    updateState { it.copy(isSearch = isSearch, searchQuery = searchQuery) }
   }
 
   override fun handleUpText() {

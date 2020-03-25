@@ -1,8 +1,6 @@
 package ru.skillbranch.skillarticles.ui.custom.behaviors
 
-import android.content.Context
 import android.os.Build
-import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -11,7 +9,7 @@ import ru.skillbranch.skillarticles.ui.custom.Bottombar
 import java.lang.Float.max
 import java.lang.Float.min
 
-class BottombarBehavior(context: Context, attrs: AttributeSet) : CoordinatorLayout.Behavior<Bottombar>(context, attrs) {
+class BottombarBehavior : CoordinatorLayout.Behavior<Bottombar>() {
 
   override fun onStartNestedScroll(
     coordinatorLayout: CoordinatorLayout, child: Bottombar, directTargetChild: View, target: View, axes: Int, type: Int

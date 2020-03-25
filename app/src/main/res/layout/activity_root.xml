@@ -60,8 +60,8 @@
       android:layout_height="wrap_content"
       android:layout_gravity="bottom"
       android:elevation="4dp"
+      android:minHeight="56dp"
       android:theme="@style/ArticleBarsTheme"
-      app:layout_behavior=".ui.custom.behaviors.BottombarBehavior"
       app:layout_insetEdge="bottom"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -26,7 +26,7 @@ class RootActivity : AppCompatActivity() {
 
   private lateinit var viewModel: ArticleViewModel
 
-  private var isSearch: Boolean = false
+  private var isSearchMode: Boolean = false
   private var queryString: String? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,39 +48,39 @@ class RootActivity : AppCompatActivity() {
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
     menuInflater.inflate(R.menu.menu_search, menu)
-
     val searchItem = menu?.findItem(R.id.action_search)
+    val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
+    searchView.queryHint = getString(R.string.article_search_placeholder)
+
+    if (isSearchMode) {
+      searchItem?.expandActionView()
+      searchView.setQuery(queryString, false)
+      searchView.clearFocus()
+    }
+
     searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
       override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-        viewModel.saveSearchViewState(true, queryString)
+        viewModel.handleSearchMode(true)
         return true
       }
 
       override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-        viewModel.saveSearchViewState(false, queryString)
-        // invalidateOptionsMenu()
+        viewModel.handleSearchMode(false)
         return true
       }
     })
 
-    if (isSearch) searchItem?.expandActionView()
-
-    val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
     searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
       override fun onQueryTextSubmit(query: String?): Boolean {
-        queryString = ""
-        viewModel.saveSearchViewState(true, queryString)
-        return false
+        viewModel.handleSearchText(query)
+        return true
       }
 
       override fun onQueryTextChange(newText: String?): Boolean {
-        if (!newText.isNullOrBlank()) queryString = newText
-        viewModel.saveSearchViewState(true, queryString)
-        return false
+        viewModel.handleSearchText(newText)
+        return true
       }
     })
-
-    searchView.setQuery(queryString, false)
 
     return true
   }
@@ -108,7 +108,7 @@ class RootActivity : AppCompatActivity() {
     val logo = if (toolbar.childCount > 2) toolbar.getChildAt(2) as ImageView else null
     logo?.scaleType = ImageView.ScaleType.CENTER_CROP
 
-    (logo?.layoutParams as Toolbar.LayoutParams)?.let {
+    (logo?.layoutParams as Toolbar.LayoutParams).let {
       it.width = this.dpToIntPx(40)
       it.height = this.dpToIntPx(40)
       it.marginEnd = this.dpToIntPx(16)
@@ -131,7 +131,7 @@ class RootActivity : AppCompatActivity() {
 
   private fun renderUi(data: ArticleState) {
     // bind search view
-    isSearch = data.isSearch
+    isSearchMode = data.isSearch
     queryString = data.searchQuery
 
     // bind submenu state

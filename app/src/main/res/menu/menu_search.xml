@@ -10,7 +10,7 @@
       android:iconTint="@color/color_on_article_bar"
       android:title=""
       app:actionViewClass="androidx.appcompat.widget.SearchView"
-      app:showAsAction="ifRoom|collapseActionView"
+      app:showAsAction="always|collapseActionView"
       tools:iconTint="#FFF"/>
 
 </menu>

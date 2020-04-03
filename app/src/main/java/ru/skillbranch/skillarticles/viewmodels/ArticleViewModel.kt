@@ -55,8 +55,12 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
   // load data from db
   private fun getArticlePersonalInfo() = repository.loadArticlePersonalInfo(articleId)
 
-  override fun saveSearchViewState(isSearch: Boolean, searchQuery: String?) {
-    updateState { it.copy(isSearch = isSearch, searchQuery = searchQuery) }
+  override fun handleSearchMode(isSearch: Boolean) {
+    updateState { it.copy(isSearch = isSearch) }
+  }
+
+  override fun handleSearchText(searchQuery: String?) {
+    updateState { it.copy(searchQuery = searchQuery) }
   }
 
   override fun handleUpText() {

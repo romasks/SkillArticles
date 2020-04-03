@@ -63,6 +63,12 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     updateState { it.copy(searchQuery = searchQuery) }
   }
 
+  override fun handleUpResult() {
+  }
+
+  override fun handleDownResult() {
+  }
+
   override fun handleUpText() {
     repository.updateSettings(currentState.toAppSettings().copy(isBigText = true))
   }

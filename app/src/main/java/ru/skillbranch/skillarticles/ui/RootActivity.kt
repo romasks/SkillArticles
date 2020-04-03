@@ -116,23 +116,35 @@ class RootActivity : AppCompatActivity() {
     }
   }
 
-  private fun setupBottombar() {
+  private fun setupSubmenu() {
     btn_text_up.setOnClickListener { viewModel.handleUpText() }
     btn_text_down.setOnClickListener { viewModel.handleDownText() }
     switch_mode.setOnClickListener { viewModel.handleNightMode() }
   }
 
-  private fun setupSubmenu() {
+  private fun setupBottombar() {
     btn_like.setOnClickListener { viewModel.handleLike() }
     btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
     btn_share.setOnClickListener { viewModel.handleShare() }
     btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
+
+    btn_result_up.setOnClickListener {
+      viewModel.handleUpResult()
+    }
+    btn_result_down.setOnClickListener {
+      viewModel.handleDownResult()
+    }
+    btn_search_close.setOnClickListener {
+      viewModel.handleSearchMode(false)
+      invalidateOptionsMenu()
+    }
   }
 
   private fun renderUi(data: ArticleState) {
     // bind search view
     isSearchMode = data.isSearch
     queryString = data.searchQuery
+    bottombar.setSearchState(data.isSearch)
 
     // bind submenu state
     btn_settings.isChecked = data.isShowMenu

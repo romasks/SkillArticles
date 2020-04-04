@@ -5,6 +5,7 @@ import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.extensions.indexesOf
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
@@ -63,14 +64,19 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     updateState { it.copy(isSearch = isSearch) }
   }
 
-  override fun handleSearchText(searchQuery: String?) {
-    updateState { it.copy(searchQuery = searchQuery) }
+  override fun handleSearch(searchQuery: String?) {
+    searchQuery ?: return
+    val result = (currentState.content.firstOrNull() as? String)?.indexesOf(searchQuery)!!
+      .map { it to it + searchQuery.length }
+    updateState { it.copy(searchQuery = searchQuery, searchResult = result) }
   }
 
   override fun handleUpResult() {
+    updateState { it.copy(searchPosition = it.searchPosition.dec()) }
   }
 
   override fun handleDownResult() {
+    updateState { it.copy(searchPosition = it.searchPosition.inc()) }
   }
 
   override fun handleUpText() {

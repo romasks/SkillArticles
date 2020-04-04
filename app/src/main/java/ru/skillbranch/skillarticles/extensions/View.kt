@@ -17,3 +17,8 @@ fun NestedScrollView.setMarginOptionally(
   this.right = right
   this.bottom = bottom
 }
+
+fun String.indexesOf(substr: String, ignoreCase: Boolean = true) : List<Int> {
+  val content = if (ignoreCase) toLowerCase() else this
+  return Regex(substr).findAll(content).map { it.range.first }.toList().filter { it != -1 }
+}

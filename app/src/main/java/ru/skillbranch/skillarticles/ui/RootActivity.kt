@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -17,24 +16,24 @@ import kotlinx.android.synthetic.main.layout_bottom_bar.*
 import kotlinx.android.synthetic.main.layout_submenu.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.setMarginOptionally
+import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
-import ru.skillbranch.skillarticles.viewmodels.Notify
-import ru.skillbranch.skillarticles.viewmodels.ViewModelFactory
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
+import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
-class RootActivity : AppCompatActivity() {
+class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
-  private lateinit var viewModel: ArticleViewModel
+  override lateinit var viewModel: ArticleViewModel
 
   private var isSearchMode: Boolean = false
   private var queryString: String? = null
 
+  override var layout = R.layout.activity_root
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_root)
-    setupToolbar()
-    setupBottombar()
-    setupSubmenu()
 
     val vmFactory = ViewModelFactory("0")
     viewModel = ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)
@@ -44,6 +43,34 @@ class RootActivity : AppCompatActivity() {
     viewModel.observeNotifications(this) {
       renderNotification(it)
     }
+  }
+
+  override fun setupViews() {
+    setupToolbar()
+    setupBottombar()
+    setupSubmenu()
+  }
+
+  override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
+    TODO("not implemented")
+  }
+
+  override fun renderSearchPosition(searchPosition: Int) {
+    TODO("not implemented")
+  }
+
+  override fun clearSearchResult() {
+    TODO("not implemented")
+  }
+
+  override fun showSearchBar() {
+    bottombar.setSearchState(true)
+    scroll.setMarginOptionally(bottom = dpToIntPx(56))
+  }
+
+  override fun hideSearchBar() {
+    bottombar.setSearchState(false)
+    scroll.setMarginOptionally(bottom = dpToIntPx(0))
   }
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -144,7 +171,7 @@ class RootActivity : AppCompatActivity() {
     // bind search view
     isSearchMode = data.isSearch
     queryString = data.searchQuery
-    bottombar.setSearchState(data.isSearch)
+    if (data.isSearch) showSearchBar() else hideSearchBar()
 
     // bind submenu state
     btn_settings.isChecked = data.isShowMenu
@@ -190,7 +217,7 @@ class RootActivity : AppCompatActivity() {
         with(snackbar) {
           setActionTextColor(getColor(R.color.color_accent_dark))
           setAction(notify.actionLabel) {
-            notify.actionHandler?.invoke()
+            notify.actionHandler.invoke()
           }
         }
       }

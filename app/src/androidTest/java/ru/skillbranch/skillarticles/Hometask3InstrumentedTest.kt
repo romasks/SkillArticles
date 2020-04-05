@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class Hometask3InstrumentedTest {
   @get:Rule
   val testRule = InstantTaskExecutorRule()
 

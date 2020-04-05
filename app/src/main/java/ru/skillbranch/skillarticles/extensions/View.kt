@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.extensions
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
@@ -12,10 +13,9 @@ fun NestedScrollView.setMarginOptionally(
   right: Int = marginRight,
   bottom: Int = marginBottom
 ) {
-  this.left = left
-  this.top = top
-  this.right = right
-  this.bottom = bottom
+  val lp = layoutParams as CoordinatorLayout.LayoutParams
+  lp.setMargins(left, top, right, bottom)
+  layoutParams = lp
 }
 
 fun String.indexesOf(substr: String, ignoreCase: Boolean = true) : List<Int> {

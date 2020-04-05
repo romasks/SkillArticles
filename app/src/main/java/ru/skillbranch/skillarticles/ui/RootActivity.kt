@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -38,14 +39,17 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
-  private val bgColor by AttrValue(R.attr.colorSecondary)
-  private val fgColor by AttrValue(R.attr.colorOnSecondary)
-
   override var layout = R.layout.activity_root
-  override val binding: ArticleBinding by lazy { ArticleBinding() }
   override val viewModel: ArticleViewModel by lazy {
     ViewModelProviders.of(this, ViewModelFactory("0")).get(ArticleViewModel::class.java)
   }
+
+  @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+  public override val binding: ArticleBinding by lazy { ArticleBinding() }
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  val bgColor by AttrValue(R.attr.colorSecondary)
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  val fgColor by AttrValue(R.attr.colorOnSecondary)
 
   override fun setupViews() {
     setupToolbar()

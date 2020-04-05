@@ -7,9 +7,8 @@
   <item
       android:id="@+id/action_search"
       android:icon="@drawable/ic_search_black_24dp"
-      android:iconTint="@color/color_on_article_bar"
       android:title=""
-      app:actionViewClass="androidx.appcompat.widget.SearchView"
+      app:actionLayout="@layout/layout_search_view"
       app:showAsAction="always|collapseActionView"
       tools:iconTint="#FFF"/>
 

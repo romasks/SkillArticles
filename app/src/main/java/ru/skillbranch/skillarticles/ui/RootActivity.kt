@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.ui
 
+import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
 import android.text.SpannableString
@@ -8,7 +9,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottom_bar.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import kotlinx.android.synthetic.main.layout_submenu.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
@@ -37,14 +38,11 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
-  private var isSearchMode: Boolean = false
-  private var queryString: String? = null
-
   private val bgColor by AttrValue(R.attr.colorSecondary)
   private val fgColor by AttrValue(R.attr.colorOnSecondary)
 
   override var layout = R.layout.activity_root
-  override val binding: Binding by lazy { ArticleBinding() }
+  override val binding: ArticleBinding by lazy { ArticleBinding() }
   override val viewModel: ArticleViewModel by lazy {
     ViewModelProviders.of(this, ViewModelFactory("0")).get(ArticleViewModel::class.java)
   }
@@ -107,17 +105,19 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
     menuInflater.inflate(R.menu.menu_search, menu)
-    val searchItem = menu?.findItem(R.id.action_search)
-    val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
-    searchView.queryHint = getString(R.string.article_search_placeholder)
+    val menuItem = menu?.findItem(R.id.action_search)
+    val searchView = MenuItemCompat.getActionView(menuItem) as SearchView?
+    searchView?.queryHint = getString(R.string.article_search_placeholder)
 
-    if (isSearchMode) {
-      searchItem?.expandActionView()
-      searchView.setQuery(queryString, false)
-      searchView.clearFocus()
+    if (binding.isSearch) {
+      menuItem?.expandActionView()
+      searchView?.setQuery(binding.searchQuery, false)
+
+      if (binding.isFocusedSearch) searchView?.requestFocus()
+      else searchView?.clearFocus()
     }
 
-    searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+    menuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
       override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
         viewModel.handleSearchMode(true)
         return true
@@ -129,7 +129,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
       }
     })
 
-    searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+    searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
       override fun onQueryTextSubmit(query: String?): Boolean {
         viewModel.handleSearch(query)
         return true
@@ -141,62 +141,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
       }
     })
 
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      android.R.id.home -> {
-        onBackPressed()
-      }
-      R.id.action_search -> {
-        Toast.makeText(this, "Search Selected", Toast.LENGTH_SHORT).show()
-      }
-    }
-    return true
-  }
-
-  override fun onBackPressed() {
-    Toast.makeText(this, "Back", Toast.LENGTH_SHORT).show()
-  }
-
-  private fun setupToolbar() {
-    setSupportActionBar(toolbar)
-    supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    val logo = if (toolbar.childCount > 2) toolbar.getChildAt(2) as ImageView else null
-    logo?.scaleType = ImageView.ScaleType.CENTER_CROP
-
-    (logo?.layoutParams as Toolbar.LayoutParams).let {
-      it.width = this.dpToIntPx(40)
-      it.height = this.dpToIntPx(40)
-      it.marginEnd = this.dpToIntPx(16)
-      logo.layoutParams = it
-    }
-  }
-
-  private fun setupSubmenu() {
-    btn_text_up.setOnClickListener { viewModel.handleUpText() }
-    btn_text_down.setOnClickListener { viewModel.handleDownText() }
-    switch_mode.setOnClickListener { viewModel.handleNightMode() }
-  }
-
-  private fun setupBottombar() {
-    btn_like.setOnClickListener { viewModel.handleLike() }
-    btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
-    btn_share.setOnClickListener { viewModel.handleShare() }
-    btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
-
-    btn_result_up.setOnClickListener {
-      viewModel.handleUpResult()
-    }
-    btn_result_down.setOnClickListener {
-      viewModel.handleDownResult()
-    }
-    btn_search_close.setOnClickListener {
-      viewModel.handleSearchMode(false)
-      invalidateOptionsMenu()
-    }
+    return super.onCreateOptionsMenu(menu)
   }
 
   override fun renderNotification(notify: Notify) {
@@ -228,6 +173,47 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     }
 
     snackbar.show()
+  }
+
+  private fun setupToolbar() {
+    setSupportActionBar(toolbar)
+    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+    val logo = if (toolbar.childCount > 2) toolbar.getChildAt(2) as ImageView else null
+    logo?.scaleType = ImageView.ScaleType.CENTER_CROP
+
+    (logo?.layoutParams as Toolbar.LayoutParams).let {
+      it.width = this.dpToIntPx(40)
+      it.height = this.dpToIntPx(40)
+      it.marginEnd = this.dpToIntPx(16)
+      logo.layoutParams = it
+    }
+  }
+
+  private fun setupSubmenu() {
+    btn_text_up.setOnClickListener { viewModel.handleUpText() }
+    btn_text_down.setOnClickListener { viewModel.handleDownText() }
+    switch_mode.setOnClickListener { viewModel.handleNightMode() }
+  }
+
+  private fun setupBottombar() {
+    btn_like.setOnClickListener { viewModel.handleLike() }
+    btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
+    btn_share.setOnClickListener { viewModel.handleShare() }
+    btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
+
+    btn_result_up.setOnClickListener {
+      if (search_view.hasFocus()) search_view.clearFocus()
+      viewModel.handleUpResult()
+    }
+    btn_result_down.setOnClickListener {
+      if (search_view.hasFocus()) search_view.clearFocus()
+      viewModel.handleDownResult()
+    }
+    btn_search_close.setOnClickListener {
+      viewModel.handleSearchMode(false)
+      invalidateOptionsMenu()
+    }
   }
 
   inner class ArticleBinding : Binding() {
@@ -311,6 +297,14 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
       searchQuery = data.searchQuery
       searchPosition = data.searchPosition
       searchResult = data.searchResult
+    }
+
+    override fun saveUI(outState: Bundle) {
+      outState.putBoolean(::isFocusedSearch.name, search_view?.hasFocus() ?: false)
+    }
+
+    override fun restoreUI(savedState: Bundle) {
+      isFocusedSearch = savedState.getBoolean(::isFocusedSearch.name)
     }
   }
 }

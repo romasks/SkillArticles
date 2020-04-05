@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.viewmodels
 
 import android.os.Bundle
+import androidx.core.os.bundleOf
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
@@ -61,13 +62,14 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
   private fun getArticlePersonalInfo() = repository.loadArticlePersonalInfo(articleId)
 
   override fun handleSearchMode(isSearch: Boolean) {
-    updateState { it.copy(isSearch = isSearch) }
+    updateState { it.copy(isSearch = isSearch, isShowMenu = false, searchPosition = 0) }
   }
 
   override fun handleSearch(searchQuery: String?) {
     searchQuery ?: return
-    val result = (currentState.content.firstOrNull() as? String)?.indexesOf(searchQuery)!!
-      .map { it to it + searchQuery.length }
+    val result = (currentState.content.firstOrNull() as? String)
+      ?.indexesOf(searchQuery)
+      ?.map { it to it + searchQuery.length } ?: emptyList()
     updateState { it.copy(searchQuery = searchQuery, searchResult = result) }
   }
 
@@ -150,10 +152,23 @@ data class ArticleState(
   val reviews: List<Any> = emptyList()
 ) : IViewModelState {
   override fun save(outState: Bundle) {
-    TODO("not implemented")
+    outState.putAll(
+      bundleOf(
+        "isSearch" to isSearch,
+        "searchQuery" to searchQuery,
+        "searchResult" to searchResult,
+        "searchPosition" to searchPosition
+      )
+    )
   }
 
-  override fun restore(saveStore: Bundle): IViewModelState {
-    TODO("not implemented")
+  @Suppress("UNCHECKED_CAST")
+  override fun restore(saveState: Bundle): ArticleState {
+    return copy(
+      isSearch = saveState["isSearch"] as Boolean,
+      searchQuery = saveState["searchQuery"] as? String,
+      searchResult = saveState["searchResult"] as List<Pair<Int, Int>>,
+      searchPosition = saveState["searchPosition"] as Int
+    )
   }
 }

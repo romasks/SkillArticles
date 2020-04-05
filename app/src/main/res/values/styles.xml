@@ -20,8 +20,6 @@
         <item name="colorOnSurface">@color/color_on_surface</item>
 
         <item name="snackbarStyle">@style/CustomSnackbar</item>
-
-        <item name="searchViewStyle">@style/AppSearchViewStyle</item>
     </style>
 
     <style name="ArticleBarsTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
@@ -36,15 +34,6 @@
     <style name="ArticleToolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
         <item name="titleTextColor">?attr/colorOnPrimary</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
-    </style>
-
-    <style name="AppSearchViewStyle" parent="Widget.AppCompat.SearchView">
-        <item name="android:imeActionId">6</item>
-        <item name="android:textCursorDrawable">@color/color_on_article_bar</item>
-        <item name="searchIcon">@drawable/ic_search_black_24dp</item>
-        <item name="closeIcon" tools:ignore="PrivateResource">@drawable/ic_clear_black_24dp</item>
-        <item name="queryBackground">@android:color/transparent</item>
-        <item name="queryHint">@string/hint_search</item>
     </style>
 
     <style name="BottombarIcon">

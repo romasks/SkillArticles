@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
+import ru.skillbranch.skillarticles.viewmodels.base.ViewModelDelegate
 
 abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatActivity() {
 
@@ -35,5 +36,9 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
     super.onRestoreInstanceState(savedInstanceState)
     viewModel.restoreState(savedInstanceState)
     binding.restoreUI(savedInstanceState)
+  }
+
+  internal inline fun provideViewModel(arg: Any?) : ViewModelDelegate<T> {
+    return ViewModelDelegate(viewModel.javaClass, arg)
   }
 }

@@ -4,7 +4,9 @@ import ru.skillbranch.skillarticles.data.local.PrefManager
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class PrefDelegate<T>(private val name: String, private val defaultValue: T) : ReadWriteProperty<PrefManager, T?> {
+class PrefDelegate<T>(private val defaultValue: T) : ReadWriteProperty<PrefManager, T?> {
+
+  private val name = "default"
 
   override fun getValue(thisRef: PrefManager, property: KProperty<*>): T? = with(thisRef.preferences) {
     val res: Any? = when (defaultValue) {

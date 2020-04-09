@@ -11,7 +11,7 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
 
   protected abstract val binding: Binding
   protected abstract val viewModel: T
-  protected abstract var layout: Int
+  protected abstract val layout: Int
 
   abstract fun setupViews()
   abstract fun renderNotification(notify: Notify)

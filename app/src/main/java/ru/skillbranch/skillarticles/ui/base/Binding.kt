@@ -10,8 +10,8 @@ abstract class Binding {
 
   abstract fun onFinishInflate()
   abstract fun bind(data: IViewModelState)
-  open fun saveUI(outState: Bundle) {}
-  open fun restoreUI(savedState: Bundle) {}
+  abstract fun saveUI(outState: Bundle)
+  abstract fun restoreUI(savedState: Bundle)
 
   @Suppress("UNCHECKED_CAST")
   fun <A, B, C, D> dependsOn(

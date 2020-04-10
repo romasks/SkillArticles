@@ -299,11 +299,11 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
       searchResult = data.searchResult
     }
 
-    override fun saveUI(outState: Bundle) {
+    override fun saveUi(outState: Bundle) {
       outState.putBoolean(::isFocusedSearch.name, search_view?.hasFocus() ?: false)
     }
 
-    override fun restoreUI(savedState: Bundle) {
+    override fun restoreUi(savedState: Bundle) {
       isFocusedSearch = savedState.getBoolean(::isFocusedSearch.name)
     }
   }

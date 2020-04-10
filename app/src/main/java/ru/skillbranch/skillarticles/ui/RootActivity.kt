@@ -252,7 +252,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     var isSearch: Boolean by ObserveProp(false) {
       if (it) showSearchBar() else hideSearchBar()
     }
-    private var searchResult: List<Pair<Int, Int>> by ObserveProp(emptyList())
+    private var searchResults: List<Pair<Int, Int>> by ObserveProp(emptyList())
     private var searchPosition: Int by ObserveProp(0)
 
     private var content: String by ObserveProp("loading") {
@@ -264,7 +264,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
       dependsOn<Boolean, Boolean, List<Pair<Int, Int>>, Int>(
         ::isLoadingContent,
         ::isSearch,
-        ::searchResult,
+        ::searchResults,
         ::searchPosition
       ) { ilc, iss, sr, sp ->
         if (!ilc && iss) {
@@ -296,7 +296,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
       isSearch = data.isSearch
       searchQuery = data.searchQuery
       searchPosition = data.searchPosition
-      searchResult = data.searchResult
+      searchResults = data.searchResults
     }
 
     override fun saveUi(outState: Bundle) {

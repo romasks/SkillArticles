@@ -170,7 +170,7 @@ class ExampleInstrumentedTest {
       isSearch = true,
       isShowMenu = false,
       isBigText = false,
-      searchResult = listOf(0 to 2, 4 to 6, 8 to 10, 10 to 12),
+      searchResults = listOf(0 to 2, 4 to 6, 8 to 10, 10 to 12),
       searchPosition = 3
     )
 
@@ -193,7 +193,7 @@ class ExampleInstrumentedTest {
     Espresso.onView(withId(R.id.btn_result_down))
       .check(ViewAssertions.matches(not(isEnabled())))
 
-    expectedData = expectedData.copy(isSearch = true, searchResult = listOf())
+    expectedData = expectedData.copy(isSearch = true, searchResults = listOf())
 
     scenario.onActivity { activity ->
       activity.binding.bind(expectedData)
@@ -216,7 +216,7 @@ class ExampleInstrumentedTest {
       """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nibh sapien, consectetur et ultrices quis, convallis sit amet augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vestibulum et convallis augue, eu hendrerit diam. Curabitur ut dolor at justo suscipit commodo. Curabitur consectetur, massa sed sodales sollicitudin, orci augue maximus lacus, ut elementum risus lorem nec tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Praesent accumsan tempor lorem, quis pulvinar justo. Vivamus euismod risus ac arcu pharetra fringilla.
                 Maecenas cursus vehicula erat, in eleifend diam blandit vitae. In hac habitasse platea dictumst. Duis egestas augue lectus, et vulputate diam iaculis id. Aenean vestibulum nibh vitae mi luctus tincidunt. Fusce iaculis molestie eros, ac efficitur odio cursus ac. In at orci eget eros dapibus pretium congue sed odio. Maecenas facilisis, dolor eget mollis gravida, nisi justo mattis odio, ac congue arcu risus sed turpis.
                 Sed tempor a nibh at maximus."""
-    val searchResult = listOf(322 to 325, 930 to 933, 1032 to 1035, 1060 to 1063)
+    val searchResults = listOf(322 to 325, 930 to 933, 1032 to 1035, 1060 to 1063)
 
     scenario.onActivity { activity ->
       activity.binding.bind(ArticleState().copy(content = listOf(content)))
@@ -228,13 +228,13 @@ class ExampleInstrumentedTest {
       .check(ViewAssertions.matches(isDisplayed()))
 
     scenario.onActivity { activity ->
-      activity.renderSearchResult(searchResult)
+      activity.renderSearchResult(searchResults)
     }
 
     Espresso.onView(withId(R.id.tv_text_content))
       .check(ViewAssertions.matches(withText(content)))
     Espresso.onView(withId(R.id.tv_text_content))
-      .check(ViewAssertions.matches(withSearchResult(searchResult)))
+      .check(ViewAssertions.matches(withSearchResult(searchResults)))
 
     scenario.onActivity { activity ->
       activity.renderSearchPosition(3)

@@ -246,7 +246,9 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     }
     private var isDarkMode: Boolean by RenderProp(false, false) {
       switch_mode.isChecked = it
-      delegate.localNightMode = if (it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+      delegate.localNightMode =
+        if (it) AppCompatDelegate.MODE_NIGHT_YES
+        else AppCompatDelegate.MODE_NIGHT_NO
     }
 
     var isSearch: Boolean by ObserveProp(false) {

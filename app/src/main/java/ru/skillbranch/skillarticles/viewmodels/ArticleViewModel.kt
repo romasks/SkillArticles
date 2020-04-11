@@ -91,7 +91,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
 
   override fun handleNightMode() {
     val settings = currentState.toAppSettings()
-    repository.updateSettings(currentState.toAppSettings().copy(isDarkMode = !settings.isDarkMode))
+    repository.updateSettings(settings.copy(isDarkMode = !settings.isDarkMode))
   }
 
   override fun handleLike() {

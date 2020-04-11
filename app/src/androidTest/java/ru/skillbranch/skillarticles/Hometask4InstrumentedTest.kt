@@ -47,7 +47,7 @@ import java.lang.Thread.sleep
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class Hometask4InstrumentedTest {
   companion object {
     @BeforeClass
     @JvmStatic

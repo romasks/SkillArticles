@@ -4,31 +4,40 @@ import ru.skillbranch.skillarticles.data.local.PrefManager
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class PrefDelegate<T>(private val defaultValue: T) : ReadWriteProperty<PrefManager, T?> {
+class PrefDelegate<T>(private val defaultValue: T) {
 
-  private val name = "default"
+  private var storedValue: T? = null
 
-  override fun getValue(thisRef: PrefManager, property: KProperty<*>): T? = with(thisRef.preferences) {
-    val res: Any? = when (defaultValue) {
-      is Boolean -> getBoolean(name, defaultValue)
-      is String -> getString(name, defaultValue)
-      is Float -> getFloat(name, defaultValue)
-      is Int -> getInt(name, defaultValue)
-      is Long -> getLong(name, defaultValue)
-      else -> throw IllegalArgumentException("This type cannot be saved into Preferences")
+  operator fun provideDelegate(thisRef: PrefManager, prop: KProperty<*>): ReadWriteProperty<PrefManager, T?> {
+    val key = prop.name
+    return object : ReadWriteProperty<PrefManager, T?> {
+      override fun getValue(thisRef: PrefManager, property: KProperty<*>): T? = with(thisRef.preferences) {
+        @Suppress("UNCHECKED_CAST")
+        if (storedValue == null) {
+          storedValue = when (defaultValue) {
+            is Int -> getInt(key, defaultValue) as T
+            is Long -> getLong(key, defaultValue) as T
+            is Float -> getFloat(key, defaultValue) as T
+            is String -> getString(key, defaultValue) as T
+            is Boolean -> getBoolean(key, defaultValue) as T
+            else -> throw IllegalArgumentException("This type cannot be saved into Preferences")
+          }
+        }
+        storedValue
+      }
+
+      override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T?) =
+        with(thisRef.preferences.edit()) {
+          when (value) {
+            is Boolean -> putBoolean(key, value)
+            is String -> putString(key, value)
+            is Float -> putFloat(key, value)
+            is Int -> putInt(key, value)
+            is Long -> putLong(key, value)
+            else -> throw IllegalArgumentException("This type cannot be saved into Preferences")
+          }.apply()
+          storedValue = value
+        }
     }
-    @Suppress("UNCHECKED_CAST")
-    res as T
-  }
-
-  override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T?) = with(thisRef.preferences.edit()) {
-    when (value) {
-      is Boolean -> putBoolean(name, value)
-      is String -> putString(name, value)
-      is Float -> putFloat(name, value)
-      is Int -> putInt(name, value)
-      is Long -> putLong(name, value)
-      else -> throw IllegalArgumentException("This type cannot be saved into Preferences")
-    }.apply()
   }
 }

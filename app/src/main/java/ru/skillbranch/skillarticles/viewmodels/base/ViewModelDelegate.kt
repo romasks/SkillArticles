@@ -2,20 +2,20 @@ package ru.skillbranch.skillarticles.viewmodels.base
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
-import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
+import androidx.lifecycle.ViewModelProviders
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 class ViewModelDelegate<T : ViewModel>(private val clazz: Class<T>, private val arg: Any?) :
   ReadOnlyProperty<FragmentActivity, T> {
 
-  private var value: T? = null
+  private lateinit var value: T
 
   override fun getValue(thisRef: FragmentActivity, property: KProperty<*>): T {
-    if (value == null) {
-      if (clazz.isAssignableFrom(ArticleViewModel::class.java)) value = ArticleViewModel(arg as String) as T
-      else throw IllegalArgumentException("Unknown ViewModel class")
+    if (!::value.isInitialized) value = when (arg) {
+      null -> ViewModelProviders.of(thisRef).get(clazz)
+      else -> ViewModelProviders.of(thisRef, ViewModelFactory(arg)).get(clazz)
     }
-    return value!!
+    return value
   }
 }

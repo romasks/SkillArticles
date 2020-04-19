@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.viewmodels
 
 import android.os.Bundle
+import android.util.Log
 import androidx.core.os.bundleOf
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
@@ -61,16 +62,27 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
   // load data from db
   private fun getArticlePersonalInfo() = repository.loadArticlePersonalInfo(articleId)
 
+  // app settings
+  override fun handleNightMode() {
+    val settings = currentState.toAppSettings()
+    repository.updateSettings(settings.copy(isDarkMode = !settings.isDarkMode))
+  }
+
+  // session State
+  override fun handleToggleMenu() {
+    updateState { it.copy(isShowMenu = !it.isShowMenu) }
+  }
+
   override fun handleSearchMode(isSearch: Boolean) {
     updateState { it.copy(isSearch = isSearch, isShowMenu = false, searchPosition = 0) }
   }
 
-  override fun handleSearch(searchQuery: String?) {
-    searchQuery ?: return
+  override fun handleSearch(query: String?) {
+    query ?: return
     val result = (currentState.content.firstOrNull() as String?)
-      ?.indexesOf(searchQuery)
-      ?.map { it to it + searchQuery.length } ?: emptyList()
-    updateState { it.copy(searchQuery = searchQuery, searchResults = result) }
+      ?.indexesOf(query)
+      ?.map { it to it + query.length } ?: emptyList()
+    updateState { it.copy(searchQuery = query, searchResults = result, searchPosition = 0) }
   }
 
   override fun handleUpResult() {
@@ -87,11 +99,6 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
 
   override fun handleDownText() {
     repository.updateSettings(currentState.toAppSettings().copy(isBigText = false))
-  }
-
-  override fun handleNightMode() {
-    val settings = currentState.toAppSettings()
-    repository.updateSettings(settings.copy(isDarkMode = !settings.isDarkMode))
   }
 
   override fun handleLike() {
@@ -122,10 +129,6 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     val msg = "Share is not implemented"
     notify(Notify.ErrorMessage(msg, "OK", null))
   }
-
-  override fun handleToggleMenu() {
-    updateState { it.copy(isShowMenu = !it.isShowMenu) }
-  }
 }
 
 data class ArticleState(
@@ -151,6 +154,11 @@ data class ArticleState(
   val content: List<Any> = emptyList(),
   val reviews: List<Any> = emptyList()
 ) : IViewModelState {
+
+  init {
+    Log.d("ArticleState", this.toString())
+  }
+
   override fun save(outState: Bundle) {
     outState.putAll(
       bundleOf(

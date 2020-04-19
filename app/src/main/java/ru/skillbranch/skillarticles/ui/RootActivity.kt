@@ -5,6 +5,7 @@ import android.text.Selection
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -14,7 +15,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.getSpans
-import androidx.core.view.MenuItemCompat
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottom_bar.*
@@ -42,6 +42,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
   @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
   public override val binding: ArticleBinding by lazy { ArticleBinding() }
+
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
   val bgColor by AttrValue(R.attr.colorSecondary)
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -106,7 +107,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
     menuInflater.inflate(R.menu.menu_search, menu)
     val menuItem = menu?.findItem(R.id.action_search)
-    val searchView = MenuItemCompat.getActionView(menuItem) as SearchView?
+    val searchView = menuItem?.actionView as SearchView?
     searchView?.queryHint = getString(R.string.article_search_placeholder)
 
     if (binding.isSearch) {
@@ -153,21 +154,22 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         /*nothing*/
       }
       is Notify.ActionMessage -> {
+        val (_, label, handler) = notify
+
         with(snackbar) {
           setActionTextColor(getColor(R.color.color_accent_dark))
-          setAction(notify.actionLabel) {
-            notify.actionHandler.invoke()
-          }
+          setAction(label) { handler.invoke() }
         }
       }
       is Notify.ErrorMessage -> {
+        val (_, label, handler) = notify
+
         with(snackbar) {
           setBackgroundTint(getColor(R.color.design_default_color_error))
           setTextColor(getColor(android.R.color.white))
           setActionTextColor(getColor(android.R.color.white))
-          setAction(notify.errLabel) {
-            notify.errHandler?.invoke()
-          }
+          handler ?: return@with
+          setAction(label) { handler.invoke() }
         }
       }
     }
@@ -217,6 +219,10 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
   }
 
   inner class ArticleBinding : Binding() {
+
+    init {
+      Log.d("ArticleBinding", "...init")
+    }
 
     var isFocusedSearch: Boolean = false
     var searchQuery: String? = null

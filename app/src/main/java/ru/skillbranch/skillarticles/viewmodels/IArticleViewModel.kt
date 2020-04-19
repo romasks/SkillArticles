@@ -2,7 +2,7 @@ package ru.skillbranch.skillarticles.viewmodels
 
 interface IArticleViewModel {
   fun handleSearchMode(isSearch: Boolean)
-  fun handleSearch(searchQuery: String?)
+  fun handleSearch(query: String?)
   fun handleUpResult()
   fun handleDownResult()
   fun handleNightMode()

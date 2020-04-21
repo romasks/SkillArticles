@@ -26,7 +26,7 @@ class PrefDelegate<T>(private val defaultValue: T) {
         storedValue
       }
 
-      override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T?) =
+      override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T?) {
         with(thisRef.preferences.edit()) {
           when (value) {
             is Boolean -> putBoolean(key, value)
@@ -35,9 +35,11 @@ class PrefDelegate<T>(private val defaultValue: T) {
             is Int -> putInt(key, value)
             is Long -> putLong(key, value)
             else -> throw IllegalArgumentException("This type cannot be saved into Preferences")
-          }.apply()
-          storedValue = value
+          }
+          apply()
         }
+        storedValue = value
+      }
     }
   }
 }

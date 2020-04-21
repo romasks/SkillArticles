@@ -20,29 +20,26 @@ object LocalDataHolder {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val settings = MutableLiveData(AppSettings())
 
-
     fun findArticle(articleId: String): LiveData<ArticleData?> {
         GlobalScope.launch {
             if (isDelay) delay(1000)
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 articleData.value = ArticleData(
-                        title = "CoordinatorLayout Basic",
-                        category = "Android",
-                        categoryIcon = R.drawable.logo,
-                        date = Date(),
-                        author = "Skill-Branch"
-                    )
+                    title = "CoordinatorLayout Basic",
+                    category = "Android",
+                    categoryIcon = R.drawable.logo,
+                    date = Date(),
+                    author = "Skill-Branch"
+                )
             }
-
         }
         return articleData
-
     }
 
     fun findArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo?> {
         GlobalScope.launch {
             if (isDelay) delay(500)
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 articleInfo.value = ArticlePersonalInfo(isBookmark = true)
             }
         }
@@ -60,14 +57,14 @@ object LocalDataHolder {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun clearData(){
+    fun clearData() {
         articleInfo.postValue(null)
         articleData.postValue(null)
         settings.postValue(AppSettings())
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun disableDelay(value:Boolean = false) {
+    fun disableDelay(value: Boolean = false) {
         isDelay = !value
     }
 }
@@ -80,7 +77,7 @@ object NetworkDataHolder {
     fun loadArticleContent(articleId: String): LiveData<List<Any>?> {
         GlobalScope.launch {
             if (isDelay) delay(1500)
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 content.value = listOf(longText)
             }
 
@@ -89,12 +86,12 @@ object NetworkDataHolder {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun disableDelay(value:Boolean = false) {
+    fun disableDelay(value: Boolean = false) {
         isDelay = !value
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun clearData(){
+    fun clearData() {
         content.postValue(null)
     }
 }

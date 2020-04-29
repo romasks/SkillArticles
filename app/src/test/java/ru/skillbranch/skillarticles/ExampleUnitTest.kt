@@ -38,6 +38,17 @@ class ExampleUnitTest {
     printElements(result.elements)
   }
 
+  @Test
+  fun parse_quote() {
+    val result = MarkdownParser.parse(quoteString)
+    val actual = prepare<Element.Quote>(result.elements)
+    Assert.assertEquals(expectedQuote, actual)
+
+    printResults(actual)
+    println("")
+    printElements(result.elements)
+  }
+
   private fun printResults(list: List<String>) {
     val iterator = list.iterator()
     while (iterator.hasNext()) {

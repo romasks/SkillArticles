@@ -9,9 +9,10 @@ object MarkdownParser {
   // group regex
   private const val UNORDERED_LIST_ITEM_GROUP = "(^[*+-] .+$)"
   private const val HEADER_GROUP = "(^#{1,6} .+?$)"
+  private const val QUOTE_GROUP = "(^> .+?$)"
 
   // result regex
-  private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP"
+  private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP"
 
   private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUP, Pattern.MULTILINE) }
 
@@ -49,7 +50,7 @@ object MarkdownParser {
       var text: CharSequence
 
       // groups range for iterate by groups
-      val groups = 1..2
+      val groups = 1..3
       var group = -1
       for (gr in groups) {
         if (matcher.group(gr) != null) {
@@ -88,6 +89,16 @@ object MarkdownParser {
           parents.add(element)
           lastStartIndex = endIndex
         }
+
+        // QUOTE
+        3 -> {
+          // text without "> "
+          text = string.subSequence(startIndex.plus(2), endIndex)
+          val subelements = findElements(text)
+          val element = Element.Quote(text, subelements)
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
       }
     }
 
@@ -118,6 +129,11 @@ sealed class Element() {
 
   data class Header(
     val level: Int = 1,
+    override val text: CharSequence,
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class Quote(
     override val text: CharSequence,
     override val elements: List<Element> = emptyList()
   ) : Element()

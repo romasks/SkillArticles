@@ -10,9 +10,13 @@ object MarkdownParser {
   private const val UNORDERED_LIST_ITEM_GROUP = "(^[*+-] .+$)"
   private const val HEADER_GROUP = "(^#{1,6} .+?$)"
   private const val QUOTE_GROUP = "(^> .+?$)"
+  private const val ITALIC_GROUP = "((?<!\\*)\\*[^*].*?[^*]?\\*(?!\\*)|(?<!_)_[^_].*?[^_]?_(?!_))"
+  private const val BOLD_GROUP = "((?<!\\*)\\*{2}[^*].*?[^*]?\\*{2}(?!\\*)|(?<!_)_{2}[^_].*?[^_]?_{2}(?!_))"
+  private const val STRIKE_GROUP = "((?<!~)~{2}[^~].*?[^~]?~{2}(?!~))"
 
   // result regex
-  private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP"
+  private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP|$BOLD_GROUP" +
+      "|$STRIKE_GROUP"
 
   private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUP, Pattern.MULTILINE) }
 
@@ -50,7 +54,7 @@ object MarkdownParser {
       var text: CharSequence
 
       // groups range for iterate by groups
-      val groups = 1..3
+      val groups = 1..6
       var group = -1
       for (gr in groups) {
         if (matcher.group(gr) != null) {
@@ -99,6 +103,36 @@ object MarkdownParser {
           parents.add(element)
           lastStartIndex = endIndex
         }
+
+        // ITALIC
+        4 -> {
+          // text without "*{}*"
+          text = string.subSequence(startIndex.inc(), endIndex.dec())
+          val subelements = findElements(text)
+          val element = Element.Italic(text, subelements)
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
+
+        // BOLD
+        5 -> {
+          // text without "**{}**"
+          text = string.subSequence(startIndex.plus(2), endIndex.plus(-2))
+          val subelements = findElements(text)
+          val element = Element.Bold(text, subelements)
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
+
+        // STRIKE
+        6 -> {
+          // text without "~~{}~~"
+          text = string.subSequence(startIndex.plus(2), endIndex.plus(-2))
+          val subelements = findElements(text)
+          val element = Element.Strike(text, subelements)
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
       }
     }
 
@@ -134,6 +168,21 @@ sealed class Element() {
   ) : Element()
 
   data class Quote(
+    override val text: CharSequence,
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class Italic(
+    override val text: CharSequence,
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class Bold(
+    override val text: CharSequence,
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class Strike(
     override val text: CharSequence,
     override val elements: List<Element> = emptyList()
   ) : Element()

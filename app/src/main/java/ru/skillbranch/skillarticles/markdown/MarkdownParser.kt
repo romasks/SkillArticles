@@ -13,10 +13,13 @@ object MarkdownParser {
   private const val ITALIC_GROUP = "((?<!\\*)\\*[^*].*?[^*]?\\*(?!\\*)|(?<!_)_[^_].*?[^_]?_(?!_))"
   private const val BOLD_GROUP = "((?<!\\*)\\*{2}[^*].*?[^*]?\\*{2}(?!\\*)|(?<!_)_{2}[^_].*?[^_]?_{2}(?!_))"
   private const val STRIKE_GROUP = "((?<!~)~{2}[^~].*?[^~]?~{2}(?!~))"
+  private const val RULE_GROUP = "(^[-_*]{3}$)"
+  private const val INLINE_CODE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
+  private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
 
   // result regex
   private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP|$BOLD_GROUP" +
-      "|$STRIKE_GROUP"
+      "|$STRIKE_GROUP|$RULE_GROUP|$INLINE_CODE_GROUP|$LINK_GROUP"
 
   private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUP, Pattern.MULTILINE) }
 
@@ -54,7 +57,7 @@ object MarkdownParser {
       var text: CharSequence
 
       // groups range for iterate by groups
-      val groups = 1..6
+      val groups = 1..9
       var group = -1
       for (gr in groups) {
         if (matcher.group(gr) != null) {
@@ -133,6 +136,34 @@ object MarkdownParser {
           parents.add(element)
           lastStartIndex = endIndex
         }
+
+        // RULE
+        7 -> {
+          // text without "***" insert empty character
+          val element = Element.Rule()
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
+
+        // INLINE CODE
+        8 -> {
+          // text without "`{}`"
+          text = string.subSequence(startIndex.inc(), endIndex.dec())
+          val subelements = findElements(text)
+          val element = Element.InlineCode(text, subelements)
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
+
+        // LINK
+        9 -> {
+          // full text for regex
+          text = string.subSequence(startIndex, endIndex)
+          val (title: String, link: String) = "\\[(.*)]\\((.*)\\)".toRegex().find(text)!!.destructured
+          val element = Element.Link(link, title)
+          parents.add(element)
+          lastStartIndex = endIndex
+        }
       }
     }
 
@@ -183,6 +214,22 @@ sealed class Element() {
   ) : Element()
 
   data class Strike(
+    override val text: CharSequence,
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class Rule(
+    override val text: CharSequence = " ", // for insert span
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class InlineCode(
+    override val text: CharSequence,
+    override val elements: List<Element> = emptyList()
+  ) : Element()
+
+  data class Link(
+    val link: String,
     override val text: CharSequence,
     override val elements: List<Element> = emptyList()
   ) : Element()

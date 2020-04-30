@@ -100,6 +100,44 @@ class ExampleUnitTest {
     printElements(result.elements)
   }
 
+  @Test
+  fun parse_rule() {
+    val result = MarkdownParser.parse(ruleString)
+    val actual = prepare<Element.Rule>(result.elements)
+    Assert.assertEquals(3, actual.size)
+
+    printResults(actual)
+    println("")
+    printElements(result.elements)
+  }
+
+  @Test
+  fun parse_inline_code() {
+    val result = MarkdownParser.parse(inlineString)
+    val actual = prepare<Element.InlineCode>(result.elements)
+    Assert.assertEquals(expectedInline, actual)
+
+    printResults(actual)
+    println("")
+    printElements(result.elements)
+  }
+
+  @Test
+  fun parse_link() {
+    val result = MarkdownParser.parse(linkString)
+    val actual = prepare<Element.Link>(result.elements)
+    val actualLink = result.elements.spread()
+      .filterIsInstance<Element.Link>()
+      .map { it.link }
+
+    Assert.assertEquals(expectedLink["titles"], actual)
+    Assert.assertEquals(expectedLink["links"], actualLink)
+
+    printResults(actual)
+    println("")
+    printElements(result.elements)
+  }
+
   private fun printResults(list: List<String>) {
     val iterator = list.iterator()
     while (iterator.hasNext()) {

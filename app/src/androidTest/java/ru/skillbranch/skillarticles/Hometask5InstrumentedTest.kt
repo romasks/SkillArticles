@@ -17,6 +17,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import ru.skillbranch.skillarticles.markdown.spans.BlockquotesSpan
 import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
+import ru.skillbranch.skillarticles.markdown.spans.HorizontalRuleSpan
 import ru.skillbranch.skillarticles.markdown.spans.UnorderedListSpan
 
 /**
@@ -187,6 +188,49 @@ class Hometask5InstrumentedTest {
     val lh = (paint.descent() - paint.ascent()) * span.sizes[level]!!
     val lineOffset = lbase + lh * span.linePadding
     inOrder.verify(canvas).drawLine(0f, lineOffset, canvasWidth.toFloat(), lineOffset, paint)
+    inOrder.verify(paint).color = defaultColor
+  }
+
+  @Test
+  fun draw_rule() {
+    // settings
+    val color = Color.RED
+    val width = 24f
+
+    // defaults
+    val canvasWidth = 700
+    val defaultColor = Color.GRAY
+    val cml = 0 // current margin location
+    val ltop = 0 // line top
+    val lbase = 60 // line baseline
+    val lbottom = 60 // line bottom
+
+    // mock
+    val canvas = mock(Canvas::class.java)
+    `when`(canvas.width).thenReturn(canvasWidth)
+    val paint = mock(Paint::class.java)
+    `when`(paint.color).thenReturn(defaultColor)
+    val layout = mock(Layout::class.java)
+
+    val text = SpannableString("text")
+
+    val span = HorizontalRuleSpan(width, color)
+    text.setSpan(span, 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+    // check draw line rule
+    span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
+
+    // check order call
+    val inOrder = inOrder(paint, canvas)
+    // check first set color to paint
+    inOrder.verify(paint).color = color
+    inOrder.verify(canvas).drawLine(
+      0f,
+      (ltop + lbottom) / 2f,
+      canvasWidth.toFloat(),
+      (ltop + lbottom) / 2f,
+      paint
+    )
     inOrder.verify(paint).color = defaultColor
   }
 }

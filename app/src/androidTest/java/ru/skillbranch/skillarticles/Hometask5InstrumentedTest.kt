@@ -3,6 +3,7 @@ package ru.skillbranch.skillarticles
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.text.Layout
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.inOrder
 import org.mockito.Mockito.mock
@@ -18,6 +20,7 @@ import org.mockito.Mockito.verify
 import ru.skillbranch.skillarticles.markdown.spans.BlockquotesSpan
 import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
 import ru.skillbranch.skillarticles.markdown.spans.HorizontalRuleSpan
+import ru.skillbranch.skillarticles.markdown.spans.InlineCodeSpan
 import ru.skillbranch.skillarticles.markdown.spans.UnorderedListSpan
 
 /**
@@ -231,6 +234,66 @@ class Hometask5InstrumentedTest {
       (ltop + lbottom) / 2f,
       paint
     )
+    inOrder.verify(paint).color = defaultColor
+  }
+
+  @Test
+  fun draw_inline_code() {
+    // settings
+    val textColor = Color.RED
+    val bgColor = Color.GREEN
+    val cornerRadius = 8f
+    val padding = 8f
+
+    // defaults
+    val canvasWidth = 700
+    val defaultColor = Color.GRAY
+    val measureText = 100f
+    val cml = 0 // current margin location
+    val ltop = 0 // line top
+    val lbase = 60 // line baseline
+    val lbottom = 60 // line bottom
+
+    // mock
+    val canvas = mock(Canvas::class.java)
+    `when`(canvas.width).thenReturn(canvasWidth)
+    val paint = mock(Paint::class.java)
+    `when`(paint.color).thenReturn(defaultColor)
+    `when`(
+      paint.measureText(
+        ArgumentMatchers.anyString(),
+        ArgumentMatchers.anyInt(),
+        ArgumentMatchers.anyInt()
+      )
+    ).thenReturn(measureText)
+    val layout = mock(Layout::class.java)
+    val fm = mock(Paint.FontMetricsInt::class.java)
+
+    val text = SpannableString("text")
+
+    val span = InlineCodeSpan(textColor, bgColor, cornerRadius, padding)
+    text.setSpan(span, 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+    // check measure size
+    val size = span.getSize(paint, text, 0, text.length, fm)
+    assertEquals((2 * padding + measureText).toInt(), size)
+
+    // check draw inline code
+    span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
+
+    val inOrder = inOrder(paint, canvas)
+    // check draw background
+    inOrder.verify(paint).color = bgColor
+    inOrder.verify(canvas).drawRoundRect(
+      RectF(0f, ltop.toFloat(), measureText + 2 * padding, lbottom.toFloat()),
+      cornerRadius,
+      cornerRadius,
+      paint
+    )
+
+    // check draw background
+    inOrder.verify(paint).color = textColor
+    inOrder.verify(canvas).drawText(text, 0, text.length, cml + padding, lbase.toFloat(), paint)
     inOrder.verify(paint).color = defaultColor
   }
 }

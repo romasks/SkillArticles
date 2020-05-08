@@ -6,65 +6,126 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.drawable.Drawable
 import android.text.style.ReplacementSpan
+import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
 
 class IconLinkSpan(
-    private val linkDrawable: Drawable,
-    @ColorInt
-    private val iconColor: Int,
-    @Px
-    private val padding: Float,
-    @ColorInt
-    private val textColor: Int,
-    dotWidth: Float = 6f
+  private val linkDrawable: Drawable,
+  @ColorInt
+  private val iconColor: Int,
+  @Px
+  private val padding: Float,
+  @ColorInt
+  private val textColor: Int,
+  dotWidth: Float = 6f
 ) : ReplacementSpan() {
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var iconSize = 0
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var textWidth = 0f
-    private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var path = Path()
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  var iconSize = 0
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  var textWidth = 0f
+  private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  var path = Path()
 
-    override fun draw(
-        canvas: Canvas,
-        text: CharSequence,
-        start: Int,
-        end: Int,
-        x: Float,
-        top: Int,
-        y: Int,
-        bottom: Int,
-        paint: Paint
-    ) {
-        //TODO implement me
+  override fun draw(
+    canvas: Canvas,
+    text: CharSequence,
+    start: Int,
+    end: Int,
+    x: Float,
+    top: Int,
+    y: Int,
+    bottom: Int,
+    paint: Paint
+  ) {
+    val TAG = "IconLinkSpan draw"
+
+    val textStart = x + iconSize + padding
+    Log.d(TAG, "forLine")
+    paint.forLine {
+      path.reset()
+      path.moveTo(textStart, bottom.toFloat())
+      path.lineTo(textStart + textWidth, bottom.toFloat())
+      canvas.drawPath(path, paint)
     }
 
-
-    override fun getSize(
-        paint: Paint,
-        text: CharSequence?,
-        start: Int,
-        end: Int,
-        fm: Paint.FontMetricsInt?
-    ): Int {
-        //TODO implement me
-        return 0
+    Log.d(TAG, "forIcon")
+    paint.forIcon {
+      Log.d(TAG, "111")
+      canvas.save()
+      Log.d(TAG, "222")
+      val trY = bottom - linkDrawable.bounds.bottom
+      Log.d(TAG, "333")
+      canvas.translate(x, trY.toFloat())
+      Log.d(TAG, "444")
+      linkDrawable.draw(canvas)
+      Log.d(TAG, "555")
+      canvas.restore()
     }
 
-
-    private inline fun Paint.forLine(block: () -> Unit) {
-        //TODO implement me
+    Log.d(TAG, "forText")
+    paint.forText {
+      canvas.drawText(text, start, end, textStart, y.toFloat(), paint)
     }
+  }
 
-    private inline fun Paint.forText(block: () -> Unit) {
-        //TODO implement me
-    }
+  override fun getSize(
+    paint: Paint,
+    text: CharSequence?,
+    start: Int,
+    end: Int,
+    fm: Paint.FontMetricsInt?
+  ): Int {
 
-    private inline fun Paint.forIcon(block: () -> Unit) {
-        //TODO implement me
+    if (fm != null) {
+      iconSize = fm.descent - fm.ascent // fontSize
+      linkDrawable.setBounds(0, 0, iconSize, iconSize)
+      linkDrawable.setTint(iconColor)
     }
+    textWidth = paint.measureText(text.toString(), start, end)
+    return (iconSize + padding + textWidth).toInt()
+  }
+
+  private inline fun Paint.forLine(block: () -> Unit) {
+    val oldColor = color
+    val oldStyle = style
+    val oldWidth = strokeWidth
+
+    pathEffect = dashs
+    color = textColor
+    style = Paint.Style.STROKE
+    strokeWidth = 0f
+
+    block()
+
+    color = oldColor
+    style = oldStyle
+    strokeWidth = oldWidth
+  }
+
+  private inline fun Paint.forText(block: () -> Unit) {
+    val oldColor = color
+
+    color = textColor
+
+    block()
+
+    color = oldColor
+  }
+
+  private inline fun Paint.forIcon(block: () -> Unit) {
+    val oldColor = color
+    val oldStyle = style
+
+    color = textColor
+    style = Paint.Style.STROKE
+
+    block()
+
+    color = oldColor
+    style = oldStyle
+  }
 }

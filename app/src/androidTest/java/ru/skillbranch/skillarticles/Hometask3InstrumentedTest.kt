@@ -161,7 +161,7 @@ class Hometask3InstrumentedTest {
       )
 
     //change content data
-    NetworkDataHolder.content.value = listOf("long long text content")
+    NetworkDataHolder.content.value = "long long text content"
 
     vm.state.test()
       .awaitValue()

@@ -79,7 +79,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
 
   override fun handleSearch(query: String?) {
     query ?: return
-    val result = (currentState.content.firstOrNull() as String?)
+    val result = currentState.content
       ?.indexesOf(query)
       ?.map { it to it + query.length } ?: emptyList()
     updateState { it.copy(searchQuery = query, searchResults = result, searchPosition = 0) }
@@ -151,7 +151,7 @@ data class ArticleState(
   val date: String? = null,
   val author: Any? = null,
   val poster: String? = null,
-  val content: List<Any> = emptyList(),
+  val content: String? = null,
   val reviews: List<Any> = emptyList()
 ) : IViewModelState {
 

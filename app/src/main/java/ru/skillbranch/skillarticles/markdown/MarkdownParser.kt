@@ -35,8 +35,29 @@ object MarkdownParser {
   /*
   * clear markdown text to string without markdown characters
   * */
-  fun clear(string: String): String? {
-    return null
+  fun clear(string: String?): String? {
+    if (string == null) return null
+    val markdown = parse(string)
+    return StringBuilder().apply {
+      markdown.elements.forEach {
+        if (it.elements.isNotEmpty())
+          clear(it.text.toString(), this)
+        else
+          apply { append(it.text) }
+      }
+    }.toString()
+  }
+
+  private fun clear(string: String, builder: StringBuilder) {
+    val markdown = parse(string)
+    builder.apply {
+      markdown.elements.forEach {
+        if (it.elements.isNotEmpty())
+          clear(it.text.toString(), this)
+        else
+          apply { append(it.text) }
+      }
+    }
   }
 
   private fun findElements(string: CharSequence): List<Element> {

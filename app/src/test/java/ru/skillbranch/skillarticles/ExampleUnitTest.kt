@@ -153,8 +153,8 @@ class ExampleUnitTest {
     val actualLinks = result.elements.spread()
       .filterIsInstance<Element.Link>()
       .map { it.link }
-//    val actualBlockCode = prepare<Element.BlockCode>(result.elements)
-//    val actualOrderedList = prepare<Element.OrderedListItem>(result.elements)
+    // val actualBlockCode = prepare<Element.BlockCode>(result.elements)
+    // val actualOrderedList = prepare<Element.OrderedListItem>(result.elements)
 
     assertEquals(expectedMarkdown["unorderedList"], actualUnorderedList)
     assertEquals(expectedMarkdown["header"], actualHeaders)
@@ -166,11 +166,18 @@ class ExampleUnitTest {
     assertEquals(expectedMarkdown["inline"], actualInline)
     assertEquals(expectedMarkdown["linkTitles"], actualLinkTitles)
     assertEquals(expectedMarkdown["links"], actualLinks)
-//    assertEquals(expectedMarkdown["multiline"], actualBlockCode)
-//    assertEquals(expectedMarkdown["orderedList"], actualOrderedList)
+    // assertEquals(expectedMarkdown["multiline"], actualBlockCode)
+    // assertEquals(expectedMarkdown["orderedList"], actualOrderedList)
 
     println("")
     printElements(result.elements)
+  }
+
+  @Test
+  fun clear() {
+    val result = MarkdownParser.clear(markdownString)
+    println(result)
+    assertEquals(markdownClearString, result)
   }
 
   private fun printResults(list: List<String>) {

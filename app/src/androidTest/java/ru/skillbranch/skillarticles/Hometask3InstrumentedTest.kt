@@ -104,7 +104,7 @@ class Hometask3InstrumentedTest {
           "author" to "Skill-Branch",
           "categoryIcon" to R.drawable.logo,
           "poster" to null,
-          "content" to listOf(longText)
+          "content" to longText
         ),
         { it.toMap() }
       )
@@ -168,7 +168,7 @@ class Hometask3InstrumentedTest {
       .assertValue(
         "change content data",
         mapOf(
-          "content" to listOf("long long text content")
+          "content" to "long long text content"
         ),
         { it.toMap() }
       )

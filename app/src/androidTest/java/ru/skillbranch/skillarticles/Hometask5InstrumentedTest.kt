@@ -29,6 +29,7 @@ import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
 import ru.skillbranch.skillarticles.markdown.spans.HorizontalRuleSpan
 import ru.skillbranch.skillarticles.markdown.spans.IconLinkSpan
 import ru.skillbranch.skillarticles.markdown.spans.InlineCodeSpan
+import ru.skillbranch.skillarticles.markdown.spans.OrderedListSpan
 import ru.skillbranch.skillarticles.markdown.spans.UnorderedListSpan
 
 /**
@@ -383,7 +384,6 @@ class Hometask5InstrumentedTest {
     Log.d(TAG, "check draw icon and text")
     // check draw icon and text
     span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
-    Log.d(TAG, "1111111")
 
     val inOrder = inOrder(paint, canvas, path, linkDrawable)
 
@@ -424,6 +424,51 @@ class Hometask5InstrumentedTest {
       lbase.toFloat(),
       paint
     )
+    inOrder.verify(paint).color = defaultColor
+  }
+
+  @Test
+  fun draw_ordered_list_item() {
+    // settings
+    val color = Color.RED
+    val gap = 24f
+    val order = "1."
+
+    // defaults
+    val canvasWidth = 700
+    val defaultColor = Color.GRAY
+    val cml = 0 // current margin location
+    val ltop = 0 // line top
+    val lbase = 60 // line baseline
+    val lbottom = 60 // line bottom
+
+    // mock
+    val canvas = mock(Canvas::class.java)
+    val paint = mock(Paint::class.java)
+    `when`(paint.color).thenReturn(defaultColor)
+    val layout = mock(Layout::class.java)
+
+    val text = SpannableString("text")
+
+    val span = OrderedListSpan(gap, order, color)
+    text.setSpan(span, 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+    // check leading margin
+    assertEquals((order.length.inc() * gap).toInt(), span.getLeadingMargin(true))
+
+    // check order draw
+    span.drawLeadingMargin(
+      canvas, paint, cml, 1, ltop, lbase, lbottom,
+      text, 0, text.length, true, layout
+    )
+
+    // check order call
+    val inOrder = inOrder(paint, canvas)
+    // check first set color to paint
+    inOrder.verify(paint).color = color
+    // check draw circle bullet
+    inOrder.verify(canvas).drawText("1.", gap + cml, lbase.toFloat(), paint)
+    // check paint color restore
     inOrder.verify(paint).color = defaultColor
   }
 }

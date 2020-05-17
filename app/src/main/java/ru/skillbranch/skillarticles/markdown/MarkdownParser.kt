@@ -16,10 +16,11 @@ object MarkdownParser {
   private const val RULE_GROUP = "(^[-_*]{3}$)"
   private const val INLINE_CODE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
   private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
+  private const val ORDERED_LIST_ITEM_GROUP = "(^\\d{1,2}\\. .+$)"
 
   // result regex
   private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP|$BOLD_GROUP" +
-      "|$STRIKE_GROUP|$RULE_GROUP|$INLINE_CODE_GROUP|$LINK_GROUP"
+      "|$STRIKE_GROUP|$RULE_GROUP|$INLINE_CODE_GROUP|$LINK_GROUP|$ORDERED_LIST_ITEM_GROUP"
 
   private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUP, Pattern.MULTILINE) }
 
@@ -65,7 +66,7 @@ object MarkdownParser {
     val matcher = elementsPattern.matcher(string)
     var lastStartIndex = 0
 
-    loop@while (matcher.find(lastStartIndex)) {
+    loop@ while (matcher.find(lastStartIndex)) {
       val startIndex = matcher.start()
       val endIndex = matcher.end()
 
@@ -78,7 +79,7 @@ object MarkdownParser {
       var text: CharSequence
 
       // groups range for iterate by groups
-      val groups = 1..9
+      val groups = 1..10
       var group = -1
       for (gr in groups) {
         if (matcher.group(gr) != null) {
@@ -183,6 +184,21 @@ object MarkdownParser {
           val (title: String, link: String) = "\\[(.*)]\\((.*)\\)".toRegex().find(text)!!.destructured
           val element = Element.Link(link, title)
           parents.add(element)
+          lastStartIndex = endIndex
+        }
+
+        // ORDERED
+        10 -> {
+          // text without "1. "
+          val order = string.subSequence(startIndex, endIndex).split(".")[0] + "."
+          text = string.subSequence(startIndex.plus(order.length + 1), endIndex)
+
+          // find inner elements
+          val subs = findElements(text)
+          val element = Element.OrderedListItem(order, text, subs)
+          parents.add(element)
+
+          // next find start from position "endIndex" (last regex character)
           lastStartIndex = endIndex
         }
       }

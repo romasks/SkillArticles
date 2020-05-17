@@ -16,6 +16,7 @@ import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
 import ru.skillbranch.skillarticles.markdown.spans.HorizontalRuleSpan
 import ru.skillbranch.skillarticles.markdown.spans.IconLinkSpan
 import ru.skillbranch.skillarticles.markdown.spans.InlineCodeSpan
+import ru.skillbranch.skillarticles.markdown.spans.OrderedListSpan
 import ru.skillbranch.skillarticles.markdown.spans.UnorderedListSpan
 
 class MarkdownBuilder(context: Context) {
@@ -107,6 +108,13 @@ class MarkdownBuilder(context: Context) {
         is Element.Link -> {
           inSpans(IconLinkSpan(linkIcon, colorSecondary, gap, colorPrimary, strikeWidth)) {
             append(element.text)
+          }
+        }
+        is Element.OrderedListItem -> {
+          inSpans(OrderedListSpan(gap, element.order, colorSecondary)) {
+            for (child in element.elements) {
+              buildElement(child, builder)
+            }
           }
         }
         else -> append(element.text)

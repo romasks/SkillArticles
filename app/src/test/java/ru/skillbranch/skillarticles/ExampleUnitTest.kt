@@ -154,7 +154,7 @@ class ExampleUnitTest {
       .filterIsInstance<Element.Link>()
       .map { it.link }
     // val actualBlockCode = prepare<Element.BlockCode>(result.elements)
-    // val actualOrderedList = prepare<Element.OrderedListItem>(result.elements)
+    val actualOrderedList = prepare<Element.OrderedListItem>(result.elements)
 
     assertEquals(expectedMarkdown["unorderedList"], actualUnorderedList)
     assertEquals(expectedMarkdown["header"], actualHeaders)
@@ -167,7 +167,7 @@ class ExampleUnitTest {
     assertEquals(expectedMarkdown["linkTitles"], actualLinkTitles)
     assertEquals(expectedMarkdown["links"], actualLinks)
     // assertEquals(expectedMarkdown["multiline"], actualBlockCode)
-    // assertEquals(expectedMarkdown["orderedList"], actualOrderedList)
+    assertEquals(expectedMarkdown["orderedList"], actualOrderedList)
 
     println("")
     printElements(result.elements)

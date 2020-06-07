@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 object MarkdownParser {
 
-  private val LINE_SEPARATOR = System.getProperty("line.separator") ?: "\n"
+  private val LINE_SEPARATOR = /*System.getProperty("line.separator") ?:*/ "\n"
 
   // group regex
   private const val UNORDERED_LIST_ITEM_GROUP = "(^[*+-] .+$)"
@@ -17,10 +17,11 @@ object MarkdownParser {
   private const val INLINE_CODE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
   private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
   private const val ORDERED_LIST_ITEM_GROUP = "(^\\d{1,2}\\. .+$)"
+  private const val BLOCK_CODE_GROUP = "(^```[\\w\\s]*```\$|^```[\\w\\s].*```\$)"
 
   // result regex
   private const val MARKDOWN_GROUP = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP|$BOLD_GROUP" +
-      "|$STRIKE_GROUP|$RULE_GROUP|$INLINE_CODE_GROUP|$LINK_GROUP|$ORDERED_LIST_ITEM_GROUP"
+      "|$STRIKE_GROUP|$RULE_GROUP|$INLINE_CODE_GROUP|$LINK_GROUP|$ORDERED_LIST_ITEM_GROUP|$BLOCK_CODE_GROUP"
 
   private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUP, Pattern.MULTILINE) }
 
@@ -79,7 +80,7 @@ object MarkdownParser {
       var text: CharSequence
 
       // groups range for iterate by groups
-      val groups = 1..10
+      val groups = 1..11
       var group = -1
       for (gr in groups) {
         if (matcher.group(gr) != null) {
@@ -191,7 +192,7 @@ object MarkdownParser {
         10 -> {
           // text without "1. "
           val order = string.subSequence(startIndex, endIndex).split(".")[0] + "."
-          text = string.subSequence(startIndex.plus(order.length + 1), endIndex)
+          text = string.subSequence(startIndex.plus(order.length.inc()), endIndex)
 
           // find inner elements
           val subs = findElements(text)
@@ -199,6 +200,32 @@ object MarkdownParser {
           parents.add(element)
 
           // next find start from position "endIndex" (last regex character)
+          lastStartIndex = endIndex
+        }
+
+        // BLOCK CODE
+        11 -> {
+          // text without "```{}```"
+          text = string.subSequence(startIndex.plus(3), endIndex.plus(-3)).toString()
+
+          if (text.contains(LINE_SEPARATOR)) {
+            for ((index, line) in text.lines().withIndex()) {
+              when (index) {
+                text.lines().lastIndex -> parents.add(
+                  Element.BlockCode(Element.BlockCode.Type.END, line)
+                )
+                0 -> parents.add(
+                  Element.BlockCode(Element.BlockCode.Type.START, line + LINE_SEPARATOR)
+                )
+                else -> parents.add(
+                  Element.BlockCode(Element.BlockCode.Type.MIDDLE, line + LINE_SEPARATOR)
+                )
+              }
+            }
+          } else {
+            parents.add(Element.BlockCode(Element.BlockCode.Type.SINGLE, text))
+          }
+
           lastStartIndex = endIndex
         }
       }

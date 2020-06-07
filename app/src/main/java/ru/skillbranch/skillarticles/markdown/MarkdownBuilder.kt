@@ -11,6 +11,7 @@ import androidx.core.text.inSpans
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToPx
+import ru.skillbranch.skillarticles.markdown.spans.BlockCodeSpan
 import ru.skillbranch.skillarticles.markdown.spans.BlockquotesSpan
 import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
 import ru.skillbranch.skillarticles.markdown.spans.HorizontalRuleSpan
@@ -115,6 +116,11 @@ class MarkdownBuilder(context: Context) {
             for (child in element.elements) {
               buildElement(child, builder)
             }
+          }
+        }
+        is Element.BlockCode -> {
+          inSpans(BlockCodeSpan(colorOnSurface, colorSurface, cornerRadius, gap, element.type)) {
+            append(element.text)
           }
         }
         else -> append(element.text)

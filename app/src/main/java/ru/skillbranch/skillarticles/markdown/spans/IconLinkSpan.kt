@@ -6,7 +6,6 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.drawable.Drawable
 import android.text.style.ReplacementSpan
-import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
@@ -24,9 +23,11 @@ class IconLinkSpan(
 
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
   var iconSize = 0
+
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
   var textWidth = 0f
   private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
+
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
   var path = Path()
 
@@ -41,10 +42,8 @@ class IconLinkSpan(
     bottom: Int,
     paint: Paint
   ) {
-    val TAG = "IconLinkSpan draw"
 
     val textStart = x + iconSize + padding
-    Log.d(TAG, "forLine")
     paint.forLine {
       path.reset()
       path.moveTo(textStart, bottom.toFloat())
@@ -52,21 +51,14 @@ class IconLinkSpan(
       canvas.drawPath(path, paint)
     }
 
-    Log.d(TAG, "forIcon")
     paint.forIcon {
-      Log.d(TAG, "111")
       canvas.save()
-      Log.d(TAG, "222")
       val trY = bottom - linkDrawable.bounds.bottom
-      Log.d(TAG, "333")
       canvas.translate(x, trY.toFloat())
-      Log.d(TAG, "444")
       linkDrawable.draw(canvas)
-      Log.d(TAG, "555")
       canvas.restore()
     }
 
-    Log.d(TAG, "forText")
     paint.forText {
       canvas.drawText(text, start, end, textStart, y.toFloat(), paint)
     }

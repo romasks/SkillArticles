@@ -8,7 +8,7 @@ import ru.skillbranch.skillarticles.extentions.data.toAppSettings
 import ru.skillbranch.skillarticles.extentions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extentions.format
 
-class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()) {
+class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
 
     private val repository = ArticleRepository
 
@@ -62,7 +62,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     }
 
     // bottom bar
-    fun handleLike() {
+    override fun handleLike() {
         val toggleLike = {
             val info = currentState.toArticlePersonalInfo()
             repository.updateArticlePersonalInfo(info.copy(isLike = !info.isLike))
@@ -76,29 +76,29 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
         notify(msg)
     }
 
-    fun handleBookmark() {
+    override fun handleBookmark() {
         updateState { it.copy(isBookmark = !it.isBookmark) }
     }
 
-    fun handleShare() {
+    override fun handleShare() {
         val msg = "Share is not implemented yet"
         notify(Notify.ErrorMessage(msg, "OK", null))
     }
 
-    fun handleToggleMenu() {
+    override fun handleToggleMenu() {
         updateState { it.copy(isShowMenu = !it.isShowMenu) }
     }
 
     // submenu
-    fun handleTextUp() {
+    override fun handleUpText() {
         currentState.toAppSettings().let { repository.updateSettings(it.copy(isBigText = true)) }
     }
 
-    fun handleTextDown() {
+    override fun handleDownText() {
         currentState.toAppSettings().let { repository.updateSettings(it.copy(isBigText = false)) }
     }
 
-    fun handleNightMode() {
+    override fun handleNightMode() {
         currentState.toAppSettings().let { repository.updateSettings(it.copy(isDarkMode = !it.isDarkMode)) }
     }
 

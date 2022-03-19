@@ -4,14 +4,16 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.shape.MaterialShapeDrawable
 import ru.skillbranch.skillarticles.databinding.LayoutBottombarBinding
+import ru.skillbranch.skillarticles.ui.custom.behaviors.BottomBarBehavior
 
 class BottomBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr), CoordinatorLayout.AttachedBehavior {
 
     private var binding = LayoutBottombarBinding.inflate(LayoutInflater.from(context), this)
 
@@ -34,4 +36,6 @@ class BottomBar @JvmOverloads constructor(
         materialBg.elevation = elevation
         background = materialBg
     }
+
+    override fun getBehavior(): CoordinatorLayout.Behavior<*> = BottomBarBehavior()
 }

@@ -1,11 +1,19 @@
 package ru.skillbranch.skillarticles.ui
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
@@ -17,10 +25,16 @@ import ru.skillbranch.skillarticles.vm.ArticleViewModel
 import ru.skillbranch.skillarticles.vm.Notify
 import ru.skillbranch.skillarticles.vm.ViewModelFactory
 
+private const val KEY_IS_SEARCH_OPEN = "IS_SEARCH_OPEN"
+private const val KEY_SEARCHED_TEXT = "SEARCHED_TEXT"
+
 class RootActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRootBinding
     private lateinit var viewModel: ArticleViewModel
+
+    private var isSearchOpen = false
+    private var searchedText = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +53,69 @@ class RootActivity : AppCompatActivity() {
         viewModel.observeNotifications(this) {
             renderNotifications(it)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.root_menu, menu)
+
+        val menuItem = menu?.findItem(R.id.action_search)
+        val searchView = menuItem?.actionView as? SearchView
+
+        searchView?.apply {
+            queryHint = getString(R.string.search_hint)
+            inputType = InputType.TYPE_CLASS_TEXT
+            imeOptions = EditorInfo.IME_ACTION_SEARCH
+        }
+
+        searchView?.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
+            setTextColor(getColor(R.color.color_on_article_bar))
+            setHintTextColor(getColor(R.color.color_gray))
+        }
+
+        if (isSearchOpen) {
+            menuItem?.expandActionView()
+            searchView?.setQuery(searchedText, false)
+        }
+
+        // Associate searchable configuration with the SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        searchView?.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchedText = newText ?: ""
+                return true
+            }
+        })
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_search) {
+            with(binding.toolbar) {
+                isSearchOpen = !isSearchOpen
+                logo.setVisible(!isSearchOpen, false)
+            }
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_IS_SEARCH_OPEN, isSearchOpen)
+        outState.putString(KEY_SEARCHED_TEXT, searchedText)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        isSearchOpen = savedInstanceState.getBoolean(KEY_IS_SEARCH_OPEN)
+        searchedText = savedInstanceState.getString(KEY_SEARCHED_TEXT) ?: ""
     }
 
     private fun renderUi(data: ArticleState) {
@@ -130,8 +207,8 @@ class RootActivity : AppCompatActivity() {
 
     private fun setupSubmenu() {
         with(binding.submenu) {
-            btnTextUp.setOnClickListener { viewModel.handleTextUp() }
-            btnTextDown.setOnClickListener { viewModel.handleTextDown() }
+            btnTextUp.setOnClickListener { viewModel.handleUpText() }
+            btnTextDown.setOnClickListener { viewModel.handleDownText() }
             switchMode.setOnClickListener { viewModel.handleNightMode() }
         }
     }

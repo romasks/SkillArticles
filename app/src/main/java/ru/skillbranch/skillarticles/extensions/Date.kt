@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.extentions
+package ru.skillbranch.skillarticles.extensions
 
 import java.text.SimpleDateFormat
 import java.util.*

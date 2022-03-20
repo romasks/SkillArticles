@@ -13,8 +13,8 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import com.google.android.material.shape.MaterialShapeDrawable
 import ru.skillbranch.skillarticles.databinding.LayoutSubmenuBinding
-import ru.skillbranch.skillarticles.extentions.dpToPx
-import ru.skillbranch.skillarticles.ui.custom.behaviors.ArticleSubmenuBehavior
+import ru.skillbranch.skillarticles.extensions.dpToPx
+import ru.skillbranch.skillarticles.ui.custom.behaviors.SubmenuBehavior
 import kotlin.math.hypot
 
 class ArticleSubmenu @JvmOverloads constructor(
@@ -125,5 +125,5 @@ class ArticleSubmenu @JvmOverloads constructor(
         }
     }
 
-    override fun getBehavior(): CoordinatorLayout.Behavior<*> = ArticleSubmenuBehavior()
+    override fun getBehavior(): CoordinatorLayout.Behavior<*> = SubmenuBehavior()
 }

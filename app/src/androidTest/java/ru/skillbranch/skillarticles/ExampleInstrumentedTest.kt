@@ -8,10 +8,10 @@ import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import ru.skillbranch.skillarticles.data.*
-import ru.skillbranch.skillarticles.extentions.format
-import ru.skillbranch.skillarticles.vm.ArticleState
-import ru.skillbranch.skillarticles.vm.ArticleViewModel
-import ru.skillbranch.skillarticles.vm.Notify
+import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.viewmodels.ArticleState
+import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
+import ru.skillbranch.skillarticles.viewmodels.Notify
 import java.util.*
 import java.util.concurrent.TimeUnit
 

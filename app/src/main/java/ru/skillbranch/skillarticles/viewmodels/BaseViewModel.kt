@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.vm
+package ru.skillbranch.skillarticles.viewmodels
 
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting

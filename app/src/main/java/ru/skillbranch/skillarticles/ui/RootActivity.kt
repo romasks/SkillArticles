@@ -19,11 +19,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.databinding.ActivityRootBinding
-import ru.skillbranch.skillarticles.extentions.dpToIntPx
-import ru.skillbranch.skillarticles.vm.ArticleState
-import ru.skillbranch.skillarticles.vm.ArticleViewModel
-import ru.skillbranch.skillarticles.vm.Notify
-import ru.skillbranch.skillarticles.vm.ViewModelFactory
+import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.viewmodels.ArticleState
+import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
+import ru.skillbranch.skillarticles.viewmodels.Notify
+import ru.skillbranch.skillarticles.viewmodels.ViewModelFactory
 
 private const val KEY_IS_SEARCH_OPEN = "IS_SEARCH_OPEN"
 private const val KEY_SEARCHED_TEXT = "SEARCHED_TEXT"

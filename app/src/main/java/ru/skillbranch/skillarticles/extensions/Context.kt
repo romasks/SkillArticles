@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.extentions
+package ru.skillbranch.skillarticles.extensions
 
 import android.content.Context
 import android.net.ConnectivityManager

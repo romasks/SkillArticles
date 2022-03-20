@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.vm
+package ru.skillbranch.skillarticles.viewmodels
 
 interface IArticleViewModel {
     fun handleNightMode()

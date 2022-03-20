@@ -1,12 +1,12 @@
-package ru.skillbranch.skillarticles.vm
+package ru.skillbranch.skillarticles.viewmodels
 
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
-import ru.skillbranch.skillarticles.extentions.data.toAppSettings
-import ru.skillbranch.skillarticles.extentions.data.toArticlePersonalInfo
-import ru.skillbranch.skillarticles.extentions.format
+import ru.skillbranch.skillarticles.extensions.data.toAppSettings
+import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
+import ru.skillbranch.skillarticles.extensions.format
 
 class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
 

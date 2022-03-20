@@ -51,7 +51,7 @@
         app:layout_dodgeInsetEdges="bottom"
         tools:visibility="visible" />
 
-    <ru.skillbranch.skillarticles.ui.custom.BottomBar
+    <ru.skillbranch.skillarticles.ui.custom.Bottombar
         android:id="@+id/bottombar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
